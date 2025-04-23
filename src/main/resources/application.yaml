@@ -1,0 +1,57 @@
+#metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+
+#swagger
+xset:
+  openapi:
+    dev-url: http://localhost:8080
+    prod-url: https://xset-api.com
+
+#database
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+  datasource:
+    url: jdbc:postgresql://${PSQL_HOST:0.0.0.0}:55000/postgres
+    username: postgres
+    password:
+    driver-class-name: org.postgresql.Driver
+  #uploads
+  servlet:
+    multipart:
+      enabled: true
+#kafka all properties https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+  kafka:
+    producer:
+      bootstrap-servers: 0.0.0.0:9092
+    consumer:
+      bootstrap-servers: 0.0.0.0:9092
+      group-id: yourGroupId
+    template:
+      default-topic: registration
+
+#JMX
+#-Dcom.sun.management.jmxremote
+#-Dcom.sun.management.jmxremote.port=YOUR_JMX_PORT
+#-Dcom.sun.management.jmxremote.rmi.port=YOUR_JMX_PORT
+#-Dcom.sun.management.jmxremote.authenticate=false
+#-Dcom.sun.management.jmxremote.ssl=false
+#-Djava.rmi.server.hostname=YOUR_JMX_HOST

@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>RELEASE</version>
+            <version>3.2.0</version> <!--   REALEASE -> 3.2.0 -->
             <scope>compile</scope>
         </dependency>
 <!--        For App-->

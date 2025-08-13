@@ -7,37 +7,79 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres  # Пароль (можно оставить пустым, но не рекомендуется)
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     ports:
       - "2181:2181"
     environment:
-      ZOOKEEPER_JVMFLAGS: "-Djdk.internal.platform.cgroupv1.CgroupV1Subsystem=force"
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-
+      ZOOKEEPER_HEAP_OPTS: "-Xmx512M -Xms256M"
+    healthcheck:
+      test: [ "CMD-SHELL", "echo stat | nc -w 2 localhost 2181 | grep -q Mode || exit 0" ]
+      interval: 15s
+      timeout: 20s
+      retries: 10
+      start_period: 15s  # Увеличенный период для инициализации
   kafka:
     image: confluentinc/cp-kafka:7.3.0
     depends_on:
-      - zookeeper
+        zookeeper:
+          condition: service_healthy
     ports:
-      - "9092:9092"
-      - "29092:29092"
+        - "9092:9092"
+        - "29092:29092"
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://kafka:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_BROKER_ID: 1  # Добавляем явный broker ID
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms256m"
     volumes:
       - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka:9092 || exit 0" ]
+      interval: 20s
+      timeout: 20s
+      retries: 10
+      start_period: 10s  # Даём Kafka больше времени на запуск
+
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  postgres_data:
   kafka_data:
+  postgres_data:

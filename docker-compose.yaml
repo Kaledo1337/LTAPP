@@ -55,7 +55,7 @@ services:
       interval: 20s
       timeout: 20s
       retries: 10
-      start_period: 10s  # Даём Kafka больше времени на запуск
+      start_period: 20s  # Даём Kafka больше времени на запуск
 
 
   app:
@@ -79,7 +79,57 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana
+    ports:
+       - "3000:3000"
+    volumes:
+       - grafana_data:/var/lib/grafana
+    depends_on:
+       - prometheus
+  # Node Exporter (системные метрики CPU, RAM, Disk)
+  node-exporter:
+    image: prom/node-exporter
+    command:
+      - "--path.rootfs=/host"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|run|var/lib/docker/.+)($$|/)"
+      - "--collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\\d+n\\d+p)\\d+$$"
+    volumes:
+      - "/:/host:ro,rslave"
+      - "/run/udev:/run/udev:ro"  # Добавлено для исправления ошибки udev
+    pid: "host"  # Доступ к данным процессов
+    network_mode: "host"  # Доступ к сетевым интерфейсам
+    restart: unless-stopped
+  # Kafka Exporter (метрики Kafka)
+  kafka-exporter:
+    image: danielqsj/kafka-exporter
+    environment:
+      KAFKA_BROKERS: "kafka:9092"
+    ports:
+      - "9308:9308"
+    depends_on:
+      - kafka
+
+  # PostgreSQL Exporter
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:password@postgres:5432/postgres?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres
 
 volumes:
   kafka_data:
   postgres_data:
+  grafana_data:

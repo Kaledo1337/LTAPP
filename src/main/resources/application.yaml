@@ -6,9 +6,17 @@ management:
         include: '*'
       base-path: /actuator  # Рекомендуется явно указать базовый путь
   metrics:
+    enable:
+      kafka: true
     distribution:
       percentiles-histogram:
         "[http.server.requests]": true
+      percentiles:
+        kafka.produce.time: [ 0.5, 0.95 ] # Перцентили для метрик
+      sla:
+        kafka.listener.process.time: 1s # SLA для обработки сообщений
+    tags:
+      application: LT-app
   endpoint:
     health:
       show-details: always  # Для более детальной информации о здоровье
@@ -39,6 +47,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 30000  # Увеличенный таймаут для Docker
+      metrics-enabled: true  # Мониторинг пула соединений БД
   #uploads
   servlet:
     multipart:
@@ -51,11 +60,15 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      metrics:
+        enabled: true
     consumer:
       group-id: yourGroupId
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      metrics:
+        enabled: true
     listener:
       ack-mode: manual  # Для явного управления квитированием
     template:

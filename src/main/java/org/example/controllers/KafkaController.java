@@ -80,6 +80,7 @@ public class KafkaController {
      * @param message The message received from Kafka.
      */
     @KafkaListener(topics = "${spring.kafka.template.default-topic}", groupId = "${spring.kafka.consumer.group-id}")
+    @Counted(value = "kafka.messages.count", description = "Total number of processed Kafka messages")
     public void listen(String message) {
         messages.add(message);
     }

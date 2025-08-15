@@ -3,7 +3,7 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  # Spring Boot приложение
+
   - job_name: 'spring-app'
     metrics_path: '/actuator/prometheus'
     static_configs:
@@ -14,30 +14,27 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: 'app:8080'  # Адрес сервиса в Docker сети
+        replacement: 'app:8080'
 
-  # Node Exporter (системные метрики)
   - job_name: 'node'
     static_configs:
       - targets: ['node-exporter:9100']
     metrics_path: '/metrics'
 
-  # Kafka Exporter
   - job_name: 'kafka'
     static_configs:
       - targets: ['kafka-exporter:9308']
     metrics_path: '/metrics'
 
-  # PostgreSQL Exporter
   - job_name: 'postgres'
     static_configs:
       - targets: ['postgres-exporter:9187']
     metrics_path: '/metrics'
 
-  # Prometheus самоменеджмент
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+
   - job_name: 'docker'
     static_configs:
-      - targets: [ 'localhost:9323' ]
+      - targets: ['localhost:9323']

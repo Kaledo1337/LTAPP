@@ -4,7 +4,7 @@ management:
     web:
       exposure:
         include: '*'
-      base-path: /actuator  # Рекомендуется явно указать базовый путь
+      base-path: /actuator
   metrics:
     enable:
       kafka: true
@@ -12,14 +12,14 @@ management:
       percentiles-histogram:
         "[http.server.requests]": true
       percentiles:
-        kafka.produce.time: [ 0.5, 0.95 ] # Перцентили для метрик
+        kafka.produce.time: [ 0.5, 0.95 ] #
       sla:
-        kafka.listener.process.time: 1s # SLA для обработки сообщений
+        kafka.listener.process.time: 1s
     tags:
       application: LT-app
   endpoint:
     health:
-      show-details: always  # Для более детальной информации о здоровье
+      show-details: always
   prometheus:
     metrics:
       export:
@@ -39,24 +39,24 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    show-sql: true  # Включено для отладки (можно отключить после)
+    show-sql: true
   datasource:
-    url: jdbc:postgresql://postgres:5432/postgres  # Исправлено с localhost на postgres
+    url: jdbc:postgresql://postgres:5432/postgres
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
     hikari:
-      connection-timeout: 30000  # Увеличенный таймаут для Docker
-      metrics-enabled: true  # Мониторинг пула соединений БД
-  #uploads
+      connection-timeout: 30000  #
+      metrics-enabled: true
+
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  #kafka
+
   kafka:
-    bootstrap-servers: kafka:9092  # Общее свойство для producer/consumer
+    bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -70,13 +70,13 @@ spring:
       metrics:
         enabled: true
     listener:
-      ack-mode: manual  # Для явного управления квитированием
+      ack-mode: manual
     template:
       default-topic: my-default-topic
-# Дополнительные настройки
+
 server:
   port: 8080
-  shutdown: graceful  # Для корректного завершения работы
+  shutdown: graceful
 
 #JMX
 #-Dcom.sun.management.jmxremote

@@ -43,13 +43,32 @@
     build:
       dockerfile: Dockerfile
 ```
+---
+
 В *docker-compose.yaml* и был создан сам ***Dockerfile*** для запуска приложения с указанием пути по конфигурационному файлу.✨ 
 В файле *prometheus.yaml* были добавлены job'ы ***kafka,node,postgres,prometheus,app*** для сбора метрик.✨ 
+
+---
 Для того, чтобы отследить, с каких сервисов приходят метрики, необходимо перейти по ссылке *http://localhost:9090/targets* сразу после запуска приложения. Рабочие сервисы отображены в статусе ***UP***:
 
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/Screenshot_271.png)
 
-🏆 
+### Все ссылки для метрик подключенных сервисов:
+- *http://localhost:9090* - прометей
+- *http://localhost:9090/targets* - таргеты прометея (видимость передачи метрик контейнеров).
+- *http://localhost:9187/metrics* - метрики postgres.
+- *http://localhost:9308/metrics* - метрики kafka.
+- *http://localhost:8080/actuator/prometheus* - все метрики приложения.
+- *http://localhost:3000/* - порт графаны.
+---
+* Далее переходим в ***Grafana***. Нажимаем *import dashboard*, средством вывода метрик берём prometheus и указываем его хост *http://localhost:9090*, при импорте указываем id дашборда (***1860*** - node, ***7589*** - kafka, ***9628*** - postgres):
 
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/Screenshot_.png)
+
+---
+* Проверим, что kafka и postgres имеют синхронизацию с grafana, запущены и передают метрики корректно. Для этого выведем 2 ***promql***: *pg_up* для постгреса (должно быть 1) и *kafka_brokers* (должно быть 1).
+
+Системные метрики перед началом теста (дашборд ***1860*** - node):
 
 
 🎉 

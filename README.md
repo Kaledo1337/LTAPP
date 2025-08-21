@@ -92,7 +92,11 @@
 
 Имеем следующие методы:
 
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/swg.png)
+
 Структура *Test Plan* в JMeter, в первых двух Thread group описаны методы для ***kafka***, в третьей работа с бинарным файлом:
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/jmtr.png)
 
 Сохраняем файл и указываем папку нашего проекта.
 Для запуска теста переходим в папку *~/apache-jmeter-5.6.3/bin* и вводим комманду:
@@ -108,9 +112,30 @@
 
 Пиковые показатели в графане:
 
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/fir1.png)
+
 Получим результаты JMeter из файла results.jtl. Для этого в терминале введём следующую команду:
 ```
 rm -rf ~/Рабочий\ стол/xs5/report/*
 ./jmeter -n -t ~/Рабочий\ стол/xs5/Threads.jmx -l ~/Рабочий\ стол/xs5/result.jtl -e -o ~/Рабочий\ стол/xs5/report
 ```
+Переходим в папку проекта, выбираем */results/index.html*:
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/results1.png)
+
+---
+Видим, что все request'ы прошли. 
+Сразу перейдём на стресс-тестирование со следующими параметрами:
+- Метод /api/sendMessage: количество "пользователей" - 10000, рамп тайм - 300 сек, кол-во повторений - 2.
+- Метод /api/getMessage: количество "пользователей" - 1500, рамп тайм - 200 сек, кол-во повторений - 1.
+- Метод /api/sendMessage: количество "пользователей" - 1000, рамп тайм - 20 сек, кол-во повторений - 2.
+- Метод /api/sendMessage: количество "пользователей" - 1000, рамп тайм - 20 сек, кол-во повторений - 2.
+
+Результат:
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/err1.png)
+
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/ers.png)
+
 🎆 🎊 

@@ -67,9 +67,22 @@
 
 ---
 * Проверим, что kafka и postgres имеют синхронизацию с grafana, запущены и передают метрики корректно. Для этого выведем 2 ***promql***: *pg_up* для постгреса (должно быть 1) и *kafka_brokers* (должно быть 1).
+  
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/scr2.png)
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/scr4.png)
 
 Системные метрики перед началом теста (дашборд ***1860*** - node):
 
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/Screenshot3.png)
+
+Метрики postgreSQL (дашборд ***9628*** - postgres):
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/Screenshot33.png)
+
+Метрики kafka (дашборд ***7589*** - kafka):
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/screen55.png)
 
 🎉 
 

@@ -132,23 +132,49 @@ rate(0) /* увеличиваем до 20к */ random_arrivals(2 min) rate(20000
 Таким образом для группы наших 4 ручек на бэке доходим до 80к реквестов, на каждый период поставим по 2 минуты на увеличение количества запросов, по достижению пика "ступеньки" будем удерживать нагрузку на протяжении минуты, чтобы выяснить, как будет вести себя система.
 Наша группа в ***jmeter***:
 
-![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/err133.png)
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/Screenshot_284.png)
 
 Настроим алертинг в графане:
 
-![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/err133.png)
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/Screenshot_285.png)
 
 Для стресс тестирования выполним тест полностью, без прерывания теста в случае ошибок.
 
 В результате за время тестирования несколько раз было превышено использование CPU (>80%), прилетел alert по RAM (>80%), postgres и kafka упали. При составлении отчёта в логах можно отследить примерное количество реквестов, при котором появляются ошибки:
 
-![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/err133.png)
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/alerts.jpg)
 
-Результат:
+Логи:
 
-![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/err1.png)
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/Screenshot_286.png)
 
+По логам видно, что большой процент ошибок получается при requests rate > 35 000, на каждую из ручек суммарно. Также, используя визуализацию в дашборде графаны, получаем результаты:
 
 ![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/ers.png)
+
+* RPS суммарно не более 400 в секунду.
+* У kafka начинаются проблемы при 200 запросах в секунду.
+* С postgres ситуация аналогичная, ~200 RPS.
+---
+
+Проведём подтверждение теста максимум:
+Выберем thread group с увеличением реквестов до 20 000 за 5 минут. 
+Результаты:
+
+***Логи***:
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/logs1.png)
+
+При пересечении порога 32 000 + 5 000 реквестов появляются ошибки в приложении.
+Отобразим в графане метрики при выполнении теста - повтора:
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/logs2.png)
+
+При превышении 250 RPS kafka / postgres упали.
+RAM также превысил своё значение в 80%:
+
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/logs3.png)
+
+
 
 🎆 🎊 

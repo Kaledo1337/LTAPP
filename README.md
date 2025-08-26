@@ -150,9 +150,9 @@ rate(0) /* увеличиваем до 20к */ random_arrivals(2 min) rate(20000
 
 По логам видно, что большой процент ошибок получается при requests rate > 35 000, на каждую из ручек суммарно. Также, используя визуализацию в дашборде графаны, получаем результаты:
 
-![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/ers.png)
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/metrics.png)
 
-* RPS суммарно не более 400 в секунду.
+* RPS суммарно ~ 400 - 500.
 * У kafka начинаются проблемы при 200 запросах в секунду.
 * С postgres ситуация аналогичная, ~200 RPS.
 ---
@@ -163,7 +163,7 @@ rate(0) /* увеличиваем до 20к */ random_arrivals(2 min) rate(20000
 
 ***Логи***:
 
-![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/logs1.png)
+![docker](https://raw.githubusercontent.com/Kaledo1337/LTAPP/xs5/images/logs.png)
 
 При пересечении порога 32 000 + 5 000 реквестов появляются ошибки в приложении.
 Отобразим в графане метрики при выполнении теста - повтора:
